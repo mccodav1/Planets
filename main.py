@@ -141,7 +141,7 @@ starWriter.color('white')
 
 for y in range(-int(win.window_height()/2), int(win.window_height()/2), int(200/STAR_DENSITY)):
     for count in range(int(STAR_DENSITY/2)):
-        starX = random.randint(-int(win.window_width()/2) + 25, int(win.window_width()/2) - 25)
+        starX = random.randint(-int(win.window_width()/2), int(win.window_width()/2))
         starWriter.goto(starX, y)
         starWriter.write('.')
 
