@@ -1,15 +1,17 @@
 import turtle
 import math
-
+import random
 
 planets = ['MERCURY', 'VENUS', 'EARTH', 'MARS', 'JUPITER', 'SATURN', 'URANUS', 'NEPTUNE', 'PLUTO']
-colors = ['gray', 'light yellow', 'blue', 'red', 'orange', 'gold', 'light blue', 'light blue', 'white']
+colors = ['#b1adad', '#e7d520', '#6b93d6', '#c1440e', '#d8ca9d', '#ceb8b8', '#93cdf1', '#5b5ddf', '#fff1d5']
 orbitalRadius = [57.9, 108.2, 149.6, 227.9, 778.6, 1433.5, 2872.5, 4495.1, 5906.4]
 orbitalPeriod = [88.0, 224.7, 365.2, 687.0, 4331, 10747, 30589, 59800, 90560]
 
 FPS = 120
-
 SCALE = 2
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 800
+STAR_DENSITY = 10  # Keep below 50
 
 
 class Planet:
@@ -35,7 +37,6 @@ class Planet:
         self.nameWriter.color(self.color)
         self.move(0)
         self.turtle.pd()
-
 
     @property
     def x(self):
@@ -90,17 +91,14 @@ def zoomOut():
     SCALE *= .95
 
 
-
 def speedUp():
     global FPS
-    FPS += 10
+    FPS *= 1.1
 
 
 def slowDown():
     global FPS
-    if FPS < 10:
-        return
-    FPS -= 10
+    FPS *= .9
 
 
 class Point:
@@ -109,48 +107,61 @@ class Point:
         self.y = y
 
 
-nameWriter = turtle.Turtle()
-nameWriter.hideturtle()
-nameWriter.pu()
-nameWriter.color('white')
-
-
 def increaseTick():
     global tick
     tick += 1
 
 
+def end():
+    global done
+    done = True
+
+
 win = turtle.Screen()
+win.setup(SCREEN_WIDTH, SCREEN_HEIGHT)
 win.bgcolor('black')
+win.tracer(0)
+
+win.listen()
+win.onkeypress(zoomIn, 'Down')
+win.onkeypress(zoomOut, 'Up')
+win.onkeypress(speedUp, 'Right')
+win.onkeypress(slowDown, 'Left')
+win.onkeypress(end, 'Escape')
+
 sun = turtle.Turtle()
 sun.shapesize(1, 1)
 sun.color('yellow')
 sun.shape('circle')
 
-win.update()
-win.tracer(0)
+starWriter = turtle.Turtle()
+starWriter.hideturtle()
+starWriter.pu()
+starWriter.color('white')
+
+for y in range(-int(win.window_height()/2), int(win.window_height()/2), int(200/STAR_DENSITY)):
+    for count in range(int(STAR_DENSITY/2)):
+        starX = random.randint(-int(win.window_width()/2) + 25, int(win.window_width()/2) - 25)
+        starWriter.goto(starX, y)
+        starWriter.write('.')
+
+starWriter.goto(-SCREEN_WIDTH/2+50, -SCREEN_HEIGHT/2+50)
+starWriter.write('Use arrow keys to zoom in and out, or change simulation speed.\nPress ESC to quit.')
 
 planetObjects = []
 for index in range(len(planets)):
     new = Planet(planets[index], orbitalRadius[index], orbitalPeriod[index], colors[index])
     planetObjects.append(new)
 
-
-tick = 0
-now = 0
-# 1000 miliseconds per second
-# 120 FPS = 120 frames / 1000 miliseconds = 1 frame / (1000/120) seconds = 1000/FPS
-win.ontimer(increaseTick, int(1000/FPS))  # tick time is rounded to int for func req
-
-done = False
 for item in planetObjects:
     item.turtle.pd()
 
-win.listen()
-win.onkeypress(zoomIn, 'Up')
-win.onkeypress(zoomOut, 'Down')
-win.onkeypress(speedUp, 'Right')
-win.onkeypress(slowDown, 'Left')
+tick = 0
+now = 0
+win.ontimer(increaseTick, int(1000/FPS))
+win.update()
+
+done = False
 while not done:
     win.update()
     if tick > now:
@@ -158,10 +169,5 @@ while not done:
         for planet in planetObjects:
             planet.move(tick)  # do stuff
         win.update()
-
         win.ontimer(increaseTick, int(1000/FPS))
 turtle.bye()
-
-
-
-
