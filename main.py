@@ -1,6 +1,7 @@
 import turtle
 import math
 import random
+import time
 
 planets = ['MERCURY', 'VENUS', 'EARTH', 'MARS', 'JUPITER', 'SATURN', 'URANUS', 'NEPTUNE', 'PLUTO']
 colors = ['#b1adad', '#e7d520', '#6b93d6', '#c1440e', '#d8ca9d', '#ceb8b8', '#93cdf1', '#5b5ddf', '#fff1d5']
@@ -9,8 +10,8 @@ orbitalPeriod = [88.0, 224.7, 365.2, 687.0, 4331, 10747, 30589, 59800, 90560]
 
 FPS = 120
 SCALE = 2
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 800
+SCREEN_WIDTH = 1200
+SCREEN_HEIGHT = 1000
 STAR_DENSITY = 10  # Keep below 50
 
 
@@ -163,11 +164,9 @@ win.update()
 
 done = False
 while not done:
+    tick += 1
+    for planet in planetObjects:
+        planet.move(tick)  # do stuff
     win.update()
-    if tick > now:
-        now = tick
-        for planet in planetObjects:
-            planet.move(tick)  # do stuff
-        win.update()
-        win.ontimer(increaseTick, int(1000/FPS))
+    time.sleep(1/FPS)
 turtle.bye()
